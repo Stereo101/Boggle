@@ -37,18 +37,17 @@ class boggle:
 			for b in a:
 				print(b,end="")
 			print()
-	def getAllWords(self,tri):
-		words = {}
-		for i in range(5):
-			for k in range(5):
-				fingers = finger(k,i,{},tri,"").getFingers(self,tri)
-				while(len(fingers) > 0):
-					for f in fingers:
-						fingers.remove(f)
-						if(f.triPtr.isWord and f.word not in words):
-							words[f.word] = True
-							print(f.word)
-						fingers.extend(f.getFingers(self,tri))
+	def getAllWordsFromNode(self,tri,words,i,k):
+		fingers = finger(k,i,{},tri,"").getFingers(self)
+
+		print("ENTER FINGER LENGTH ==",len(fingers))
+		while(len(fingers) > 0):
+			print("FINGER LENGTH ==",len(fingers))
+			f = fingers.pop()
+			if(f.triPtr.isWord and f.word not in words):
+				words[f.word] = True
+				print(f.word)
+			fingers.extend(f.getFingers(self))
 		return words
 class finger:
 	def __init__(self,x,y,path,triPtr,word):
@@ -57,14 +56,18 @@ class finger:
 		self.y = y
 		self.path = deepcopy(path)
 		self.path[(x,y)] = True
-		self.triPtr = deepcopy(triPtr)
-	def getFingers(self,bog,tri):
+		self.triPtr = triPtr
+	def getFingers(self,bog):
 		fingers = []
-		for i in range(-1,2):
-			for k in range(-1,2):
-				if((i+self.y,k+self.x) not in self.path and i+self.y < 5 and k+self.x < 5 and i+self.y > 0 and k+self.x > 0):
-					if(bog.bog[i+self.y][k+self.x] in tri.adj):
-						fingers.append(finger(k+self.x,i+self.y,self.path,tri.adj[bog.bog[i+self.y][k+self.x]],self.word+bog.bog[i+self.y][k+self.x]))
+		for i in [-1,0,1]:
+			for k in [-1,0,1]:
+				xcord = k+self.x
+				ycord = i+self.y
+				if((xcord,ycord) not in self.path and ycord < 5 and xcord < 5 and ycord >= 0 and xcord >= 0):
+					c = bog.bog[i+self.y][k+self.x]
+					if(c in self.triPtr.adj):
+						print("APPENDING FINGER")
+						fingers.append(finger(xcord, ycord, self.path, self.triPtr.adj[c],self.word+c))
 		return fingers
 					
 					
@@ -79,6 +82,9 @@ def loadTriFromDictFile(filename):
 
 tri = loadTriFromDictFile("wordlist")
 b = boggle("abcdefghijklmnopqrstuvwxy")
+print("Is 'g' a word?",tri.hasWord('g'))
 b.show()
-
-print(b.getAllWords(tri))
+words = {}
+b.getAllWordsFromNode(tri,words,0,0)
+for i in words.keys():
+	print(i,"in tri?",tri.hasWord(i))
