@@ -39,16 +39,17 @@ class boggle:
 			print()
 	def getAllWordsFromNode(self,tri,words,i,k):
 		fingers = finger(k,i,{},tri,"").getFingers(self)
-
-		print("ENTER FINGER LENGTH ==",len(fingers))
 		while(len(fingers) > 0):
-			print("FINGER LENGTH ==",len(fingers))
 			f = fingers.pop()
 			if(f.triPtr.isWord and f.word not in words):
 				words[f.word] = True
 				print(f.word)
 			fingers.extend(f.getFingers(self))
 		return words
+	def getAllWords(self,tri,words):
+		for i in range(5):
+			for k in range(5):
+				self.getAllWordsFromNode(tri,words,i,k)
 class finger:
 	def __init__(self,x,y,path,triPtr,word):
 		self.word = word
@@ -66,7 +67,6 @@ class finger:
 				if((xcord,ycord) not in self.path and ycord < 5 and xcord < 5 and ycord >= 0 and xcord >= 0):
 					c = bog.bog[i+self.y][k+self.x]
 					if(c in self.triPtr.adj):
-						print("APPENDING FINGER")
 						fingers.append(finger(xcord, ycord, self.path, self.triPtr.adj[c],self.word+c))
 		return fingers
 					
@@ -79,12 +79,14 @@ def loadTriFromDictFile(filename):
 	return tri
 
 
-
+wordDict = {}
+for w in open("wordlist","r").read().splitlines():
+	wordDict[w] = True
 tri = loadTriFromDictFile("wordlist")
 b = boggle("abcdefghijklmnopqrstuvwxy")
 print("Is 'g' a word?",tri.hasWord('g'))
 b.show()
 words = {}
-b.getAllWordsFromNode(tri,words,0,0)
+b.getAllWords(tri,words)
 for i in words.keys():
-	print(i,"in tri?",tri.hasWord(i))
+	print(i,"in tri?",tri.hasWord(i),". is in Dict?",i in wordDict)
