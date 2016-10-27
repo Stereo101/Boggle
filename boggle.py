@@ -80,10 +80,10 @@ def loadTriFromDictFile(filename):
 
 
 wordDict = {}
-for w in open("wordlist","r").read().splitlines():
+for w in open("words.txt","r").read().splitlines():
 	wordDict[w] = True
-tri = loadTriFromDictFile("wordlist")
-b = boggle("abcdefghijklmnopqrstuvwxy")
+tri = loadTriFromDictFile("words.txt")
+b = boggle("geuthtqowinrdryenecmehacn")
 print("Is 'g' a word?",tri.hasWord('g'))
 b.show()
 words = {}
